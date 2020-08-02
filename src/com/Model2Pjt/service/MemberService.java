@@ -1,11 +1,13 @@
 package com.Model2Pjt.service;
 
+import java.util.ArrayList;
+
 import com.Model2Pjt.dao.MemberDAO;
 import com.Model2Pjt.vo.MemberVo;
 
 public class MemberService {
 	private static MemberService service = new MemberService();
-	public MemberDAO dao = MemberDAO.getInstance();
+	private MemberDAO dao = MemberDAO.getInstance();
 	
 	private void MemberService() { }
 	
@@ -25,5 +27,13 @@ public class MemberService {
 	public MemberVo memberSearch(String id) {
 		MemberVo member = dao.memberSearch(id);
 		return member;
+	}
+	
+	public void memberUpdate(MemberVo member) {
+		dao.memberUpdate(member);
+	}
+	
+	public ArrayList<MemberVo> memberList(){
+		return dao.memberList();
 	}
 }

@@ -14,10 +14,14 @@ public class MemberSearchController implements Controller{
 	public void execute(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		String id = req.getParameter("id");
 		String job = req.getParameter("job");
-		String path = null;
+		String path = null, password = null;
 		
 		if(job.equals("search")) {
 			path = "/memberSearch.jsp";
+		}
+		else if(job.equals("update")) {
+			path = "/memberUpdate.jsp";
+			password = req.getParameter("pw");
 		}
 		
 		if(id.isEmpty()) {
@@ -29,10 +33,17 @@ public class MemberSearchController implements Controller{
 		MemberService service = MemberService.getInstance();
 		MemberVo member = service.memberSearch(id);
 		
-		// Output
+		// Output		
 		if(member == null) req.setAttribute("result", "검색된 정보가 없습니다!");
+		else if(password == null || (job.equals("update") && !password.equals(member.getPassword()))) {
+			req.setAttribute("error", "비밀번호가 틀렸습니다.");
+			HttpUtil.forward(req, resp, path);
+			return;
+		}
+		
 		req.setAttribute("member", member);
 		if(job.equals("search")) path = "/result/memberSearchOutput.jsp";
+
 		HttpUtil.forward(req, resp, path);
 	}
 }

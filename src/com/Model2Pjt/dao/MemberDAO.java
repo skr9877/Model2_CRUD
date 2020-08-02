@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
 import com.Model2Pjt.vo.MemberVo;
 
@@ -93,10 +94,7 @@ public class MemberDAO {
 		try {
 			conn = connect();
 			pstmt = conn.prepareStatement(sql);
-			
 			pstmt.setString(1, member.getId());
-			
-			System.out.println("출력 : " + member.getId());
 			
 			pstmt.executeUpdate();
 		}
@@ -141,5 +139,69 @@ public class MemberDAO {
 		}
 		
 		return member;
+	}
+	
+	public void memberUpdate(MemberVo member) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		
+		String sql = "UPDATE MEMBERS "
+				+    "SET PASSWORD = ?, NAME = ?, EMAIL = ? "
+				+    "WHERE ID = ?";
+		
+		try {
+			conn = connect();
+			pstmt = conn.prepareStatement(sql);
+			
+			pstmt.setString(1, member.getPassword());
+			pstmt.setString(2, member.getName());
+			pstmt.setString(3, member.getEmail());
+			pstmt.setString(4, member.getId());
+			
+			pstmt.executeUpdate();
+		}
+		catch(Exception e){
+			System.out.println("삭제 오류 발생 " + e);
+		}
+		finally {
+			close(conn,pstmt);
+		}
+	}
+	
+	public ArrayList<MemberVo> memberList() {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		ArrayList<MemberVo> list = new ArrayList<MemberVo>();
+		MemberVo member = null;
+		
+		String sql = "SELECT ID, PASSWORD, NAME, EMAIL, GENDER FROM MEMBERS";
+		
+		try {
+			conn = connect();
+			pstmt = conn.prepareStatement(sql);
+			
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				member = new MemberVo();
+				
+				member.setId(rs.getString("ID"));
+				member.setPassword(rs.getString("PASSWORD"));
+				member.setName(rs.getString("NAME"));
+				member.setEmail(rs.getString("EMAIL"));
+				member.setGender(rs.getString("GENDER"));
+				
+				list.add(member);
+			}
+		}
+		catch(Exception e){
+			System.out.println("탐색 오류 발생 " + e);
+		}
+		finally {
+			close(conn,pstmt, rs);
+		}
+		
+		return list;
 	}
 }
